@@ -22,7 +22,7 @@ for k in (
 
 def set_config(consts):
     for i, j in consts.items():
-        if not i.startswith('handle_'):
+        if not i.startswith(('handle_', 'before_', 'after_')):
             config.set(i, j)
 
 
@@ -31,3 +31,20 @@ set_config(defaults.consts)
 
 def call_config(key, *args, **kwargs):
     return config.call(key, *args, **kwargs)
+
+
+def on_event(name):
+    def decorator(fn):
+        config.set(name, fn)
+        return fn
+
+    return decorator
+
+
+for k in (
+    'before_user_signup',
+    'after_user_signup',
+    'before_user_signin',
+    'after_user_signin',
+):
+    config.set(k, getattr(defaults, k))

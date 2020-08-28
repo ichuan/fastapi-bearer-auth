@@ -69,3 +69,19 @@ async def verify_password(plain_password, hashed_password):
 
 async def get_password_hash(password):
     return pwd_context.hash(password)
+
+
+async def before_user_signup(request, username, password):
+    pass
+
+
+async def after_user_signup(request, user):
+    pass
+
+
+async def before_user_signin(request, username, password):
+    pass
+
+
+async def after_user_signin(request, user):
+    pass
