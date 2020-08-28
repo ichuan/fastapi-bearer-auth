@@ -101,28 +101,3 @@ Use something like `fba.set_config({'SECRET_KEY': 'xxx', ...})` to change it.
 
 
 The default tokenUrl for openapi docs is `user/signin`, you can override this by setting env var `TOKEN_URL`.
-
-
-## Events
-
-To get notified before user signup or signin:
-
-```python
-@fba.on_event('before_user_signup')
-def before_user_signup(request, username, password):
-    print('user signup')
-
-
-@fba.on_event('before_user_signin')
-def before_user_signin(request, username, password):
-    print('user signin')
-```
-
-To abort the request (stop signup/signin), raise a `ValueError` in your event handler, like:
-
-```python
-@fba.on_event('before_user_signin')
-def before_user_signin(request, a, b):
-    if request.client.host != '127.0.0.1':
-        raise ValueError('restrict!')
-```
