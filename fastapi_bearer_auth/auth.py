@@ -2,6 +2,7 @@
 # coding: utf-8
 # yc@2020/08/27
 
+import os
 from datetime import datetime, timedelta
 
 import jwt
@@ -12,8 +13,7 @@ from fastapi.security import OAuth2PasswordBearer
 from . import config
 
 
-# TODO: tokenUrl
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl='/user/signin')
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl=os.getenv('TOKEN_URL', 'user/signin'))
 
 
 async def create_access_token(user, expires: timedelta = None):
