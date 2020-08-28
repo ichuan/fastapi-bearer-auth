@@ -6,7 +6,7 @@
 from . import config
 from . import defaults
 from .auth import get_current_user  # noqa: F401
-from .router import user_router  # noqa: F401
+from .dependencies import signup, signin  # noqa: F401
 
 
 for k in (
@@ -43,8 +43,6 @@ def on_event(name):
 
 for k in (
     'before_user_signup',
-    'after_user_signup',
     'before_user_signin',
-    'after_user_signin',
 ):
     config.set(k, getattr(defaults, k))

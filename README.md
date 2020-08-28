@@ -15,17 +15,26 @@ pip install fastapi-bearer-auth
 ## Example of using
 
 ```python
+#!/usr/bin/env python
+# coding: utf-8
+# yc@2020/08/27
+
+from pydantic import BaseModel
 from fastapi import FastAPI, Depends
 
 import fastapi_bearer_auth as fba
 
 
+class UserOut(BaseModel):
+    username: str
+
+
 app = FastAPI(title='Test App')
-app.include_router(fba.user_router, prefix='/user', tags=['User'])
 # simple in-memory db
 users = {}
 
 
+# Two required handler: handle_get_user_by_name and handle_create_user
 @fba.handle_get_user_by_name
 async def get_user_by_name(name):
     return users.get(name)
@@ -43,12 +52,26 @@ async def create_user(username, password):
     return user
 
 
-@app.get('/test')
-async def test(user: dict = Depends(fba.get_current_user)):
+# Three router depends available: fba.signup, fba.signin and fba.get_current_user
+# fba.signup resolve to User object
+@app.post('/user/signup', response_model=UserOut)
+async def signup(user=Depends(fba.signup)):
+    return user
+
+
+# fba.signin resolve to {user: <user_object>, token: {token_type, access_token}}
+@app.post('/user/signin')
+async def signin(ret=Depends(fba.signin)):
+    return ret['token']
+
+
+# fba.get_current_user resolve to User object or a HTTP 401 response
+@app.get('/user/me', response_model=UserOut)
+async def me(user=Depends(fba.get_current_user)):
     return user
 ```
 
-Now head to http://127.0.0.1:8000/docs to test the API. Note the `test` route, using `fba.get_current_user` dependency to restrict resource for authenticated user.
+Now head to http://127.0.0.1:8000/docs to test the API. Note the `me` route, using `fba.get_current_user` dependency to restrict resource for authenticated user.
 
 There's a simple command to achive this without writing any code:
 
@@ -82,26 +105,18 @@ The default tokenUrl for openapi docs is `user/signin`, you can override this by
 
 ## Events
 
-To get notified before or after user signuped:
+To get notified before user signup or signin:
 
 ```python
 @fba.on_event('before_user_signup')
 def before_user_signup(request, username, password):
-    print('user signed-up')
+    print('user signup')
 
 
-@fba.on_event('after_user_signup')
-def after_user_signup(request, user):
-    print('user signed-up')
+@fba.on_event('before_user_signin')
+def before_user_signin(request, username, password):
+    print('user signin')
 ```
-
-Complete list of events and their params:
-
-- `before_user_signup(request, username, password)`
-- `after_user_signup(request, user)`
-- `before_user_signin(request, username, password)`
-- `after_user_signin(request, user)`
-
 
 To abort the request (stop signup/signin), raise a `ValueError` in your event handler, like:
 
