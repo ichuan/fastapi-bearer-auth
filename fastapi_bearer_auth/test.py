@@ -2,7 +2,7 @@
 # coding: utf-8
 # yc@2020/08/27
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends
 
 import fastapi_bearer_auth as fba
 
@@ -28,4 +28,9 @@ async def create_user(username, password):
         'password': await fba.call_config('get_password_hash', password),
     }
     users[username] = user
+    return user
+
+
+@app.get('/test')
+async def test(user: dict = Depends(fba.get_current_user)):
     return user

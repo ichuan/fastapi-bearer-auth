@@ -5,7 +5,7 @@
 
 from . import config
 from . import defaults
-
+from .auth import get_current_user  # noqa: F401
 from .router import user_router  # noqa: F401
 
 

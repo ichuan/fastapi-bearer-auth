@@ -15,15 +15,13 @@ pip install fastapi-bearer-auth
 ## Example of using
 
 ```python
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends
 
 import fastapi_bearer_auth as fba
 
 
 app = FastAPI(title='Test App')
 app.include_router(fba.user_router, prefix='/user', tags=['User'])
-
-
 # simple in-memory db
 users = {}
 
@@ -43,9 +41,14 @@ async def create_user(username, password):
     }
     users[username] = user
     return user
+
+
+@app.get('/test')
+async def test(user: dict = Depends(fba.get_current_user)):
+    return user
 ```
 
-Now head to http://127.0.0.1:8000/docs to test the API.
+Now head to http://127.0.0.1:8000/docs to test the API. Note the `test` route, using `fba.get_current_user` dependency to restrict resource for authenticated user.
 
 There's a simple command to achive this without writing any code:
 
@@ -72,3 +75,6 @@ Also some params:
 - `SECRET_KEY`
 
 Use something like `fba.set_config({'SECRET_KEY': 'xxx', ...})` to change it.
+
+
+The default tokenUrl for openapi docs is `user/signin`, you can override this by setting env var `TOKEN_URL`.
