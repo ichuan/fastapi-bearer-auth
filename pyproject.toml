@@ -1,7 +1,7 @@
 [tool.black]
 # https://github.com/psf/black#configuration-format
 line-length = 88
-target-version = ['py37']
+target-version = ['py310']
 skip-string-normalization = true
 exclude = '''
 
@@ -21,3 +21,46 @@ exclude = '''
   | node_modules/
 )
 '''
+
+[tool.poetry]
+name = "fastapi-bearer-auth"
+version = "0.1.4"
+description = ""
+authors = ["ichuan <328225+ichuan@users.noreply.github.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+fastapi = { extras = ["standard"], version = "^0.115.6" }
+pyjwt = "^2.10.1"
+passlib = "^1.7.4"
+python-multipart = "^0.0.20"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.ruff]
+line-length = 88
+indent-width = 4
+target-version = "py312"
+
+[tool.ruff.lint]
+select = [
+  # pycodestyle
+  "E",
+  # Pyflakes
+  "F",
+  # isort
+  "I",
+]
+
+[tool.ruff.format]
+quote-style = "single"
+indent-style = "space"
+
+[tool.pyright]
+venvPath = "."
+venv = ".venv"
+reportGeneralTypeIssues = "none"

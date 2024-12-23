@@ -2,8 +2,8 @@
 # coding: utf-8
 # yc@2020/08/27
 
+from fastapi import Depends, FastAPI
 from pydantic import BaseModel
-from fastapi import FastAPI, Depends
 
 import fastapi_bearer_auth as fba
 
@@ -18,12 +18,12 @@ users = {}
 
 
 # Two required handler: handle_get_user_by_name and handle_create_user
-@fba.handle_get_user_by_name
+@fba.handle_get_user_by_name  # type: ignore
 async def get_user_by_name(name):
     return users.get(name)
 
 
-@fba.handle_create_user
+@fba.handle_create_user  # type: ignore
 async def create_user(username, password):
     if await get_user_by_name(username):
         raise ValueError('Username {} exists'.format(username))
@@ -45,6 +45,16 @@ async def signup(user=Depends(fba.signup)):
 # fba.signin resolve to {user: <user_object>, token: {token_type, access_token}}
 @app.post('/user/signin')
 async def signin(ret=Depends(fba.signin)):
+    return ret['token']
+
+
+@app.post('/user/signup-with-json', response_model=UserOut)
+async def signup_with_json(user=Depends(fba.signup_with_json)):
+    return user
+
+
+@app.post('/user/signin-with-json')
+async def signin_with_json(ret=Depends(fba.signin_with_json)):
     return ret['token']
 
 

@@ -3,11 +3,16 @@
 # yc@2020/08/27
 
 
-from . import config
-from . import defaults
+from . import config, defaults
 from .auth import get_current_user  # noqa: F401
-from .dependencies import signup, signin  # noqa: F401
-
+from .dependencies import (  # noqa: F401
+    signin,
+    signin_with_form,
+    signin_with_json,
+    signup,
+    signup_with_form,
+    signup_with_json,
+)
 
 for k in (
     'get_user_by_name',

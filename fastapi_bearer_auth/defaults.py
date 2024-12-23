@@ -2,16 +2,15 @@
 # coding: utf-8
 # yc@2020/08/27
 
-'''
+"""
 You should implement at least get_user_by_name() and create_user()
-'''
+"""
 
 import os
 
 from passlib.context import CryptContext
 
 from . import config
-
 
 user_store = {}
 pwd_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
@@ -25,17 +24,17 @@ consts = {
 
 
 async def get_user_by_name(username):
-    '''
+    """
     return a User object or None
-    '''
+    """
     return user_store.get(username)
 
 
 async def create_user(username, password, **kwargs):
-    '''
+    """
     user signups, create a user in backend db
     return a User object
-    '''
+    """
     if await config.call('get_user_by_name', username):
         raise ValueError('Username {} exists'.format(username))
     user = {
@@ -47,9 +46,9 @@ async def create_user(username, password, **kwargs):
 
 
 async def authenticate(username, password):
-    '''
+    """
     return a User object or None
-    '''
+    """
     user = await config.call('get_user_by_name', username)
     if user:
         hashed_password = getattr(user, 'password', None) or user['password']
@@ -58,9 +57,9 @@ async def authenticate(username, password):
 
 
 async def verify_password(plain_password, hashed_password):
-    '''
+    """
     returns True or False
-    '''
+    """
     try:
         return pwd_context.verify(plain_password, hashed_password)
     except Exception:
