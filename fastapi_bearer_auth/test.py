@@ -26,7 +26,7 @@ async def get_user_by_name(name):
 @fba.handle_create_user  # type: ignore
 async def create_user(username, password):
     if await get_user_by_name(username):
-        raise ValueError('Username {} exists'.format(username))
+        raise ValueError('User {} exists'.format(username))
     user = {
         'username': username,
         'password': await fba.call_config('get_password_hash', password),
@@ -48,17 +48,24 @@ async def signin(ret=Depends(fba.signin)):
     return ret['token']
 
 
-@app.post('/user/signup-with-json', response_model=UserOut)
-async def signup_with_json(user=Depends(fba.signup_with_json)):
+# To use alternative username field, also change `username` in the above `create_user`
+
+
+@app.post('/user/signup-with-json')
+async def signup_with_json(
+    user=Depends(fba.action('signup', method='json', username_field='email')),
+):
     return user
 
 
 @app.post('/user/signin-with-json')
-async def signin_with_json(ret=Depends(fba.signin_with_json)):
+async def signin_with_json(
+    ret=Depends(fba.action('signin', method='json', username_field='email')),
+):
     return ret['token']
 
 
 # fba.get_current_user resolve to User object or a HTTP 401 response
-@app.get('/user/me', response_model=UserOut)
+@app.get('/user/me')
 async def me(user=Depends(fba.get_current_user)):
     return user

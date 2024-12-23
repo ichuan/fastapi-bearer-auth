@@ -30,15 +30,15 @@ async def get_user_by_name(username):
     return user_store.get(username)
 
 
-async def create_user(username, password, **kwargs):
+async def create_user(username, password, username_field='username'):
     """
     user signups, create a user in backend db
     return a User object
     """
     if await config.call('get_user_by_name', username):
-        raise ValueError('Username {} exists'.format(username))
+        raise ValueError('User {} exists'.format(username))
     user = {
-        'username': username,
+        username_field: username,
         'password': await config.call('get_password_hash', password),
     }
     user_store[username] = user

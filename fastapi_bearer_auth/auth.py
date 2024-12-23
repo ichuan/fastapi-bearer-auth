@@ -15,11 +15,13 @@ from . import config
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl=os.getenv('TOKEN_URL', 'user/signin'))
 
 
-async def create_access_token(user, expires: timedelta | None = None):
+async def create_access_token(
+    user, expires: timedelta | None = None, name_key: str = 'username'
+):
     if expires is None:
         expires = timedelta(minutes=config.get('ACCESS_TOKEN_EXPIRE_MINUTES'))
     data = {
-        'sub': getattr(user, 'username', None) or user['username'],
+        'sub': getattr(user, name_key, None) or user[name_key],
         'exp': datetime.now(timezone.utc) + expires,
     }
     return jwt.encode(data, config.get('SECRET_KEY'), algorithm=config.get('ALGORITHM'))

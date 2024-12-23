@@ -4,14 +4,11 @@
 
 
 from . import config, defaults
-from .auth import get_current_user  # noqa: F401
-from .dependencies import (  # noqa: F401
+from .auth import get_current_user  # noqa: E402, F401
+from .dependencies import (  # noqa: E402, F401
+    action,
     signin,
-    signin_with_form,
-    signin_with_json,
     signup,
-    signup_with_form,
-    signup_with_json,
 )
 
 for k in (

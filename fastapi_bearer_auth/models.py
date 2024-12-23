@@ -5,15 +5,6 @@
 from pydantic import BaseModel
 
 
-class UserOut(BaseModel):
-    username: str
-
-
 class Token(BaseModel):
     token_type: str = 'bearer'
     access_token: str
-
-
-class User(BaseModel):
-    username: str
-    password: str
