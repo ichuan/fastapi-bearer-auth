@@ -1,3 +1,10 @@
+[tool.poetry]
+name = "fastapi-bearer-auth"
+version = "0.1.5"
+description = ""
+authors = ["ichuan <328225+ichuan@users.noreply.github.com>"]
+readme = "README.md"
+
 [tool.black]
 # https://github.com/psf/black#configuration-format
 line-length = 88
@@ -21,13 +28,6 @@ exclude = '''
   | node_modules/
 )
 '''
-
-[tool.poetry]
-name = "fastapi-bearer-auth"
-version = "0.1.4"
-description = ""
-authors = ["ichuan <328225+ichuan@users.noreply.github.com>"]
-readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.10"

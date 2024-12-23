@@ -20,6 +20,8 @@ consts = {
     ),
     'ALGORITHM': 'HS256',
     'SECRET_KEY': os.getenv('SECRET_KEY', os.urandom(32).hex()),
+    # user object field name for jwt sub
+    'USER_FIELD_FOR_JWT_SUB': 'username',
 }
 
 

@@ -48,9 +48,6 @@ async def signin(ret=Depends(fba.signin)):
     return ret['token']
 
 
-# To use alternative username field, also change `username` in the above `create_user`
-
-
 @app.post('/user/signup-with-json')
 async def signup_with_json(
     user=Depends(fba.action('signup', method='json', username_field='email')),

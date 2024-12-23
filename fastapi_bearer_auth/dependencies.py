@@ -37,9 +37,7 @@ async def _signin(
         'user': user,
         'token': {
             'token_type': 'bearer',
-            'access_token': await auth.create_access_token(
-                user, name_key=username_field
-            ),
+            'access_token': await auth.create_access_token(user),
         },
     }
 
