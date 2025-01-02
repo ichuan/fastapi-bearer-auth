@@ -25,33 +25,39 @@ consts = {
 }
 
 
-async def get_user_by_name(username):
+async def get_user_by_name(username, **extra_fields):
     """
     return a User object or None
     """
     return user_store.get(username)
 
 
-async def create_user(username, password, username_field='username'):
+async def create_user(
+    username,
+    password,
+    username_field='username',
+    **extra_fields,
+):
     """
     user signups, create a user in backend db
     return a User object
     """
-    if await config.call('get_user_by_name', username):
+    if await config.call('get_user_by_name', username, **extra_fields):
         raise ValueError('User {} exists'.format(username))
     user = {
         username_field: username,
         'password': await config.call('get_password_hash', password),
+        **extra_fields,
     }
     user_store[username] = user
     return user
 
 
-async def authenticate(username, password):
+async def authenticate(username, password, **extra_fields):
     """
     return a User object or None
     """
-    user = await config.call('get_user_by_name', username)
+    user = await config.call('get_user_by_name', username, **extra_fields)
     if user:
         hashed_password = getattr(user, 'password', None) or user['password']
         if await config.call('verify_password', password, hashed_password):

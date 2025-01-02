@@ -7,30 +7,38 @@ from typing import Annotated, Literal
 
 from fastapi import Depends, Form, HTTPException, Request
 from fastapi.security import OAuth2PasswordRequestForm
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, create_model
 
 from . import auth, config
 from .defaults import create_user
 
 
 async def _signup(
-    request: Request, username: str, password: str, username_field: str = 'username'
+    request: Request,
+    username: str,
+    password: str,
+    username_field: str = 'username',
+    **extra_fields,
 ):
-    if await config.call('get_user_by_name', username):
+    if await config.call('get_user_by_name', username, **extra_fields):
         raise HTTPException(status_code=400, detail='User exists')
     try:
         fn = config.get('create_user')
         if fn is create_user:
-            return await fn(username, password, username_field)
-        return await fn(username, password)
+            return await fn(username, password, username_field, **extra_fields)
+        return await fn(username, password, **extra_fields)
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
 
 async def _signin(
-    request: Request, username: str, password: str, username_field: str = 'username'
+    request: Request,
+    username: str,
+    password: str,
+    username_field: str = 'username',
+    **extra_fields,
 ):
-    user = await config.call('authenticate', username, password)
+    user = await config.call('authenticate', username, password, **extra_fields)
     if user is None:
         raise HTTPException(status_code=400, detail='Invalid username or password')
     return {
@@ -46,8 +54,20 @@ def action(
     action: Literal['signin', 'signup'] = 'signin',
     method: Literal['form', 'json'] = 'form',
     username_field: str = 'username',
+    extra_fields: list[str] | None = None,
 ):
-    class UserForm(BaseModel):
+    ExtraFields = create_model(
+        'ExtraFields',
+        __config__=None,
+        __module__=__name__,
+        __doc__=None,
+        __base__=BaseModel,
+        __validators__=None,
+        __cls_kwargs__=None,
+        **{f: (str, ...) for f in (extra_fields or [])},
+    )
+
+    class UserForm(ExtraFields, BaseModel):
         username: str = Field(alias=username_field)
         password: str
 
@@ -59,14 +79,27 @@ def action(
                 password=user.password,
                 scope='',
             )
+            self._form = user
 
     func = {'signin': _signin, 'signup': _signup}[action]
 
     async def _form(request: Request, form: Annotated[OAuth2Form, Depends()]):
-        return await func(request, form.username, form.password, username_field)
+        return await func(
+            request,
+            form.username,
+            form.password,
+            username_field,
+            **form._form.model_dump(exclude={'username', 'password'}),
+        )
 
     async def _json(request: Request, form: UserForm):
-        return await func(request, form.username, form.password, username_field)
+        return await func(
+            request,
+            form.username,
+            form.password,
+            username_field,
+            **form.model_dump(exclude={'username', 'password'}),
+        )
 
     return _json if method == 'json' else _form
 
