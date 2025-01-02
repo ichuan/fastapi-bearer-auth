@@ -40,7 +40,7 @@ async def _signin(
 ):
     user = await config.call('authenticate', username, password, **extra_fields)
     if user is None:
-        raise HTTPException(status_code=400, detail='Invalid username or password')
+        raise HTTPException(status_code=401, detail='Invalid username or password')
     return {
         'user': user,
         'token': {
