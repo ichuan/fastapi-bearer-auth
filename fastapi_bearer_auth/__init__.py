@@ -31,5 +31,5 @@ def set_config(consts):
 set_config(defaults.consts)
 
 
-def call_config(key, *args, **kwargs):
-    return config.call(key, *args, **kwargs)
+async def call_config(key, *args, **kwargs):
+    return await config.call(key, *args, **kwargs)

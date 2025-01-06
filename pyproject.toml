@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "fastapi-bearer-auth"
-version = "0.1.7"
+version = "0.1.8"
 description = ""
 authors = ["ichuan <328225+ichuan@users.noreply.github.com>"]
 readme = "README.md"
